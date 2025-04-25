@@ -14,11 +14,6 @@ def run_flask():
 
 threading.Thread(target=run_flask).start()
 
-config = {
-    'bot_token': '',
-    'channel_ids': [],
-    'owner_id': ''
-}
 
 BOT_TOKEN = config['bot_token']
 CHANNEL_IDS = config['channel_ids']
