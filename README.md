@@ -32,7 +32,7 @@ CHANNEL_IDS=-1001234567890,-1009876543210
 
 ---
 
-## 🚀 Deployment (Render / Fly.io)
+## 🚀 Deployment (Render)
 
 ### ✅ Requirements:
 - Python 3.10+
