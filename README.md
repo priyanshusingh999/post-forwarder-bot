@@ -36,7 +36,7 @@ CHANNEL_IDS=-1001234567890,-1009876543210
 
 ### ✅ Requirements:
 - Python 3.10+
-- `requests` & `flask` packageS
+- `requests` & `flask` packages
 
 ## 🔐 Owner-Only Logic
 Only the user with `OWNER_ID` can interact with the bot.
