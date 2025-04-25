@@ -16,7 +16,7 @@ threading.Thread(target=run_flask).start()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHANNEL_IDS = [int(cid.strip()) for cid in os.getenv('CHANNEL_IDS', '').split(",") if cid.strip()]
-OWNER_ID = os.getenv('2133811513')
+OWNER_ID = os.getenv('OWNER_ID')
 
 # Function to get updates from the bot
 def get_updates(offset=None):
