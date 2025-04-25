@@ -1,4 +1,4 @@
-import requests
+import requests, os
 import time
 import threading
 from flask import Flask
@@ -14,13 +14,10 @@ def run_flask():
 
 threading.Thread(target=run_flask).start()
 
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+CHANNEL_IDS = os.getenv('CHANNEL_IDS').split(",")  # comma separated
+OWNER_ID = os.getenv('OWNER_ID')
 
-# Load configuration from YAML file
-
-
-BOT_TOKEN = config['bot_token']
-CHANNEL_IDS = config['channel_ids']
-OWNER_ID = config['owner_id']
 
 # Function to get updates from the bot
 def get_updates(offset=None):
