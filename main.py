@@ -14,9 +14,19 @@ def run_flask():
 
 threading.Thread(target=run_flask).start()
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-CHANNEL_IDS = os.getenv('CHANNEL_IDS').split(",")  # comma separated
-OWNER_ID = os.getenv('OWNER_ID')
+config = {
+    'bot_token': '',
+    'channel_ids': [],
+    'owner_id': ''
+}
+
+BOT_TOKEN = config['bot_token']
+CHANNEL_IDS = config['channel_ids']
+OWNER_ID = config['owner_id']
+
+#BOT_TOKEN = os.getenv('BOT_TOKEN')
+#CHANNEL_IDS = os.getenv('CHANNEL_IDS').split(",")  # comma separated
+#OWNER_ID = os.getenv('OWNER_ID')
 
 
 # Function to get updates from the bot
