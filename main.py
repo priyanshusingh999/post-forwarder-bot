@@ -1,6 +1,5 @@
 import requests
 import time
-import uaml
 
 # Load configuration from YAML file
 config = {
