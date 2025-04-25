@@ -16,11 +16,7 @@ threading.Thread(target=run_flask).start()
 
 
 # Load configuration from YAML file
-config = {
-    'bot_token': '8090023526:AAGMreA8iwhBZdcEk7Ho-beEeY5AQSSSjb4',
-    'channel_ids': ['-1001997278322', '-1001990702629', '-1002021684427', '-1001802412197', '-1001992332883', '-1001827229996', '-1001715214476', '-1001883240370', '-1001731540969', '-1001616444194'],
-    'owner_id': '2133811513'
-}
+
 
 BOT_TOKEN = config['bot_token']
 CHANNEL_IDS = config['channel_ids']
