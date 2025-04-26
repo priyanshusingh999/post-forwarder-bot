@@ -6,6 +6,13 @@ No fancy libraries, pure Python using `requests` and Telegram Bot API.
 
 ---
 
+## ⚡ One-Click Deploy
+
+| Cloud Provider | Deploy Button |
+|----------------|---------------|
+| Render | <a href="https://deploystack.io/deploy/pengpan-idcard?provider=rnd&language=rnd"><img src="https://raw.githubusercontent.com/deploystackio/deploy-templates/refs/heads/main/.assets/img/rnd.svg" height="38"></a> |
+
+
 ## ✨ Features
 
 - Forward any type of message (text, media, files)
