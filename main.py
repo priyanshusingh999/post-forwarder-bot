@@ -139,7 +139,7 @@ def main():
 
             # Command Handlers
             if text.startswith("/start"):
-                send_message(chat_id, "👋 Welcome! Send any post and I’ll share it to your channels. \n\nAvailable Commands.\n/addchannel <ids> add one or more channel IDS\n/removechannel <ids> remove one or more channel IDS\n/mychannels - list your currently added channels")
+                send_message(chat_id, "👋 Welcome! Send any post and I’ll share it to your channels. \n\nAvailable Commands.\n/addchannel - add one or more channel IDS\n/removechannel - remove one or more channel IDS\n/mychannels - list your currently added channels")
 
             elif text.startswith("/addchannel"):
                 try:
