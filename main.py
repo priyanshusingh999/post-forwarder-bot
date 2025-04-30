@@ -16,7 +16,7 @@ def run_flask():
 threading.Thread(target=run_flask).start()
 
 TOKEN = os.getevn('TOKEN')
-OWNER_ID = os.getenv('OWNER_ID')
+OWNER_ID = int(os.getenv('OWNER_ID'))
 FORCE_SUB_CHANNEL = os.getenv('FORCE_SUB_CHANNEL')
 API = f"https://api.telegram.org/bot{TOKEN}"
 DB_FILE = "db.json"
