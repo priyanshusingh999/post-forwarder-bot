@@ -11,7 +11,7 @@ def home():
     return '🤖 Bot is Running! Created By @devx_coder("priyanshusingh999")'
 
 def run_flask():
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8090)
 
 threading.Thread(target=run_flask).start()
 
