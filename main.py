@@ -1,8 +1,8 @@
 import requests
 import json
 import time
-import os
 import threading
+from config import *
 from flask import Flask
 
 app = Flask(__name__)
