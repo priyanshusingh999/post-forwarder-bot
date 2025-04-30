@@ -1,60 +1,77 @@
 # 🤖 Post Forwarder Telegram Bot
 
-A simple Telegram bot that listens to messages sent to it and **forwards those messages to one or more Telegram channels** automatically.
+A simple but powerful Telegram bot that **automatically forwards any message you send to your selected Telegram channels**.
 
-No fancy libraries, pure Python using `requests` and Telegram Bot API.
+Made with 💙 using pure Python + Requests + Flask. No extra frameworks, easy to deploy anywhere — **Render** and **Koyeb** supported.
 
 ---
-
-## ⚡ One-Click Deploy
-
-| Cloud Provider | Deploy Button |
-|----------------|---------------|
-| Render | <a href="https://deploystack.io/deploy/pengpan-idcard?provider=rnd&language=rnd"><img src="https://raw.githubusercontent.com/deploystackio/deploy-templates/refs/heads/main/.assets/img/rnd.svg" height="38"></a> |
-
 
 ## ✨ Features
 
-- Forward any type of message (text, media, files)
-- Forward to **multiple channels** at once
-- Admin-only access
-- Runs on free hosting like **Render**
+- ✅ Forwards text, media, files — everything!
+- ➕ Add/remove multiple channels per user
+- 🔐 Admin-only commands (`/broadcast`, `/users`)
+- 🚫 Optional force-join a channel before use
+- 💾 Simple JSON-based database (no SQL needed)
+- ☁️ Runs on free hosting platforms like **Render** or **Koyeb**
 
 ---
 
-## 📦 Environment Variables
+## 🚀 One-Click Deploy
 
-You need to set the following environment variables:
+Deploy for free with one click:
 
-| Variable Name  | Description                            |
-|----------------|----------------------------------------|
-| `BOT_TOKEN`    | Your Telegram bot token from BotFather |
-| `CHANNEL_IDS`  | Comma-separated channel IDs to forward to (with `-100`) |
-| `OWNER_ID`     | Your numeric Telegram user ID          |
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
-📝 Example:
-```
-CHANNEL_IDS=-1001234567890,-1009876543210
-```
+[![Deploy to Koyeb](https://www.koyeb.com/static/img/deploy/button.svg)](https://app.koyeb.com/deploy)
 
 ---
 
-## 🚀 Deployment (Render)
+## ⚙️ Environment Variables
 
-### ✅ Requirements:
-- Python 3.10+
-- `requests` & `flask` packages
+| Variable Name       | Required | Description                                          |
+|---------------------|----------|------------------------------------------------------|
+| `BOT_TOKEN`         | ✅       | Telegram bot token from BotFather                    |
+| `OWNER_ID`          | ✅       | Your numeric Telegram user ID                        |
+| `FORCE_SUB_CHANNEL` | ❌       | Channel username (e.g. `@mychannel`) to force-join   |
 
-## 🔐 Owner-Only Logic
-Only the user with `OWNER_ID` can interact with the bot.
+📝 Example (`.env` or Render Environment Settings):
+
+## 🧪 Usage Guide
+
+1. **Start the bot** on Telegram:  
+   Send `/start` to begin.
+
+2. **Add channels** (must be full `channel_id`, e.g. `-100...`):
+
+
+3. **Forward any message** (text/photo/video/file) — the bot will send it to all your added channels.
+
+4. **Check or update your channel list**:  
+
+
+> ⚠️ Bot must be an **admin** in all your added channels.
 
 ---
 
-## 🧠 How It Works
-- Bot uses `getUpdates` (long polling)
-- When it receives a message from owner, it forwards it to all `CHANNEL_IDS`
+## 📜 Total Bot Commands
+
+### 👤 User Commands (for everyone)
+| Command             | Description                                  |
+|---------------------|----------------------------------------------|
+| `/start`            | Start the bot / see welcome message          |
+| `/addchannel <ids>` | Add one or more channel IDs                  |
+| `/removechannel <ids>` | Remove one or more channel IDs          |
+| `/mychannels`       | List your currently added channels           |
+
+### 👑 Owner Commands (only for `OWNER_ID`)
+| Command                  | Description                              |
+|--------------------------|------------------------------------------|
+| `/users`                 | Show total users using the bot           |
+| `/broadcast <message>`   | Send a message to all users              |
 
 ---
+
 
 ## 🙌 Credits
 Made by [@priyanshusingh999](https://github.com/priyanshusingh999)
