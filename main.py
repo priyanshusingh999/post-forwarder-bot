@@ -1,7 +1,8 @@
 import requests
 import json
-import time, os
+import time
 import threading
+from config import *
 from flask import Flask
 
 app = Flask(__name__)
@@ -11,14 +12,9 @@ def home():
     return '🤖 Bot is Running! Created By @devx_coder("priyanshusingh999")'
 
 def run_flask():
-    app.run(host='0.0.0.0', port=8090)
+    app.run(host='0.0.0.0', port=8080)
 
 threading.Thread(target=run_flask).start()
-
-# Config Variables from environment or fallback
-TOKEN = os.getenv('TOKEN')
-OWNER_ID = os.getenv('OWNER_ID')
-FORCE_SUB_CHANNEL = os.getenv('FORCE_SUB_CHANNEL')
 
 API = f"https://api.telegram.org/bot{TOKEN}"
 DB_FILE = "db.json"
@@ -139,7 +135,7 @@ def main():
 
             # Command Handlers
             if text.startswith("/start"):
-                send_message(chat_id, "👋 Welcome! Send any post and I’ll share it to your channels. \n\nAvailable Commands.\n/addchannel - add one or more channel IDS\n/removechannel - remove one or more channel IDS\n/mychannels - list your currently added channels")
+                send_message(chat_id, "👋 Welcome! Send any post and I’ll share it to your channels.")
 
             elif text.startswith("/addchannel"):
                 try:
