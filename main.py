@@ -1,5 +1,6 @@
-import requests, os
-import time
+import requests
+import json
+import time, os
 import threading
 from flask import Flask
 
@@ -10,125 +11,194 @@ def home():
     return 'Bot is running!', 200
 
 def run_flask():
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8090)
 
 threading.Thread(target=run_flask).start()
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-CHANNEL_IDS = [int(cid.strip()) for cid in os.getenv('CHANNEL_IDS', '').split(",") if cid.strip()]
+TOKEN = os.getevn('TOKEN')
 OWNER_ID = os.getenv('OWNER_ID')
+FORCE_SUB_CHANNEL = os.getenv('FORCE_SUB_CHANNEL')
+API = f"https://api.telegram.org/bot{TOKEN}"
+DB_FILE = "db.json"
 
-# Function to get updates from the bot
-def get_updates(offset=None):
-    url = f'https://api.telegram.org/bot{BOT_TOKEN}/getUpdates'
-    params = {'offset': offset}
-    response = requests.get(url, params=params)
-    return response.json()
+def load_db():
+    try:
+        with open(DB_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return {}
 
-# Function to send a message to the channel
+def save_db(data):
+    with open(DB_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
 def send_message(chat_id, text, reply_markup=None):
-    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
-    params = {'chat_id': chat_id, 'text': text}
+    payload = {"chat_id": chat_id, "text": text}
     if reply_markup:
-        params['reply_markup'] = reply_markup
-    requests.post(url, json=params)  # Use json to send the reply_markup as a JSON object
+        payload["reply_markup"] = reply_markup
+    requests.post(f"{API}/sendMessage", json=payload)
 
-# Function to send a photo to the channel with an optional caption
-def send_photo(chat_id, photo_id, caption=None):
-    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto'
-    params = {'chat_id': chat_id, 'photo': photo_id}
-    if caption:
-        params['caption'] = caption
-    requests.post(url, params=params)
+def get_updates(offset=None):
+    params = {"timeout": 30, "offset": offset}
+    response = requests.get(f"{API}/getUpdates", params=params).json()
+    return response.get("result", [])
 
-# Function to send a video to the channel with an optional caption
-def send_video(chat_id, video_id, caption=None):
-    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendVideo'
-    params = {'chat_id': chat_id, 'video': video_id}
-    if caption:
-        params['caption'] = caption
-    requests.post(url, params=params)
+def get_member_status(user_id, channel_id):
+    url = f"{API}/getChatMember"
+    params = {"chat_id": channel_id, "user_id": user_id}
+    r = requests.get(url, params=params).json()
+    return r.get("result", {}).get("status", "left")
 
-# Function to handle incoming messages
-def handle_message(message):
-    chat_id = message['chat']['id']
+def copy_message(to_chat_id, message):
+    if "text" in message:
+        send_message(to_chat_id, message["text"])
+    elif "photo" in message:
+        photo = message["photo"][-1]["file_id"]
+        caption = message.get("caption", "")
+        requests.post(f"{API}/sendPhoto", json={
+            "chat_id": to_chat_id,
+            "photo": photo,
+            "caption": caption
+        })
+    elif "video" in message:
+        video = message["video"]["file_id"]
+        caption = message.get("caption", "")
+        requests.post(f"{API}/sendVideo", json={
+            "chat_id": to_chat_id,
+            "video": video,
+            "caption": caption
+        })
+    elif "document" in message:
+        doc = message["document"]["file_id"]
+        caption = message.get("caption", "")
+        requests.post(f"{API}/sendDocument", json={
+            "chat_id": to_chat_id,
+            "document": doc,
+            "caption": caption
+        })
+    else:
+        send_message(to_chat_id, "⚠️ Unsupported message type.")
 
-    # Check if the user is the owner
-    if str(chat_id) != OWNER_ID:
-        first_name = message['chat'].get('first_name', '')
-        last_name = message['chat'].get('last_name', '')
-        rst_message = f"Welcome, {first_name} {last_name}! This Bot will Forward your Messages to Multiple Channels.\n \nYou are not authorized to use this bot. Please contact the owner."
-        inline_keyboard = {
-            "inline_keyboard": [
-                [
-                {"text": "Contact Owner", "url": "https://t.me/r_ajput999"}  # Add a
-            ]
-            ]
-        }
-        send_message(chat_id, rst_message, reply_markup=inline_keyboard)
-        return
-
-    # Check if the message is a command
-    if 'text' in message:
-        text = message['text']
-
-        # Handle the /start command
-        if text == '/start':
-            first_name = message['chat'].get('first_name', '')
-            last_name = message['chat'].get('last_name', '')
-            welcome_message = f"Welcome, {first_name} {last_name}! This bot will forward your messages to multiple channels."
-
-            # Create inline keyboard markup
-            inline_keyboard = {
-        "inline_keyboard": [
-            [
-                {"text": "JOIN CHANNEL", "url": "https://t.me/devx_coder"},
-                {"text": "DEVELOPER", "url": "https://replit.com/@priyanshu999"}
-            ],
-            [
-                {"text": "Git Hub", "url": "https://github.com/priyanshusingh999"}
-                ]
-        ]
+def force_subscribe_message(chat_id):
+    join_button = {
+        "inline_keyboard": [[
+            {
+                "text": "🔗 Join Channel",
+                "url": f"https://t.me/{FORCE_SUB_CHANNEL.strip('@')}"
+            }
+        ]]
     }
-
-            send_message(chat_id, welcome_message, reply_markup=inline_keyboard)
-            return  # Exit after sending the welcome message
-
-        # Forward text messages to all channels
-        for channel_id in CHANNEL_IDS:
-            send_message(channel_id, text)
-
-    # Check if the message contains a photo
-    elif 'photo' in message:
-        # Get the highest resolution photo
-        photo_id = message['photo'][-1]['file_id']
-        caption = message.get('caption', None)  # Get the caption if it exists
-
-        # Forward photo to all channels
-        for channel_id in CHANNEL_IDS:
-            send_photo(channel_id, photo_id, caption)
-
-    # Check if the message contains a video
-    elif 'video' in message:
-        # Get the video ID
-        video_id = message['video']['file_id']
-        caption = message.get('caption', None)  # Get the caption if it exists
-
-        # Forward video to all channels
-        for channel_id in CHANNEL_IDS:
-            send_video(channel_id, video_id, caption)
+    send_message(
+        chat_id,
+        "🔒 Pehle hamare channel ko join karo tabhi aap bot ka use kar sakte ho.",
+        reply_markup=json.dumps(join_button)
+    )
 
 def main():
+    print("🤖 Bot is running...")
+    db = load_db()
     offset = None
+
     while True:
         updates = get_updates(offset)
-        for update in updates['result']:
-            if 'message' in update:
-                handle_message(update['message'])
-                # Update the offset to the latest update
-                offset = update['update_id'] + 1
+        for update in updates:
+            offset = update["update_id"] + 1
+            message = update.get("message")
+            if not message:
+                continue
 
-        time.sleep(1)  # Sleep for a second before checking for new updates
+            user_id = message["from"]["id"]
+            chat_id = message["chat"]["id"]
+            text = message.get("text", "")
 
-if __name__ == '__main__':
+            # Force Subscribe
+            if FORCE_SUB_CHANNEL:
+                status = get_member_status(user_id, FORCE_SUB_CHANNEL)
+                if status in ["left", "kicked"]:
+                    force_subscribe_message(chat_id)
+                    continue
+
+            if str(user_id) not in db:
+                db[str(user_id)] = {"channels": []}
+                save_db(db)
+
+            user_data = db[str(user_id)]
+            user_channels = user_data.get("channels", [])
+
+            # Commands
+            if text.startswith("/start"):
+                send_message(chat_id, "👋 Welcome! Send any post and I’ll share it to your channels.")
+
+            elif text.startswith("/addchannel"):
+                try:
+                    channel_ids = text.split(" ", 1)[1].split()
+                    added = []
+                    for cid in channel_ids:
+                        if cid not in user_channels:
+                            user_channels.append(cid)
+                            added.append(cid)
+                    save_db(db)
+                    if added:
+                        send_message(chat_id, f"✅ Added channel(s):\n" + "\n".join(added))
+                    else:
+                        send_message(chat_id, "ℹ️ All channels already added.")
+                except:
+                    send_message(chat_id, "❌ Usage: /addchannel <channel_id_1> <channel_id_2> ...")
+
+            elif text.startswith("/removechannel"):
+                try:
+                    channel_ids = text.split(" ", 1)[1].split()
+                    removed = []
+                    for cid in channel_ids:
+                        if cid in user_channels:
+                            user_channels.remove(cid)
+                            removed.append(cid)
+                    save_db(db)
+                    if removed:
+                        send_message(chat_id, f"🗑️ Removed channel(s):\n" + "\n".join(removed))
+                    else:
+                        send_message(chat_id, "ℹ️ No matching channels found to remove.")
+                except:
+                    send_message(chat_id, "❌ Usage: /removechannel <channel_id_1> <channel_id_2> ...")
+
+            elif text.startswith("/mychannels"):
+                if not user_channels:
+                    send_message(chat_id, "ℹ️ Aapne abhi tak koi channel add nahi kiya hai.")
+                else:
+                    send_message(chat_id, "📋 Aapke added channels:\n" + "\n".join(user_channels))
+
+            elif text.startswith("/users") and user_id == OWNER_ID:
+                send_message(chat_id, f"👥 Total users who used the bot: {len(db)}")
+
+            elif text.startswith("/broadcast") and user_id == OWNER_ID:
+                parts = text.split(" ", 1)
+                if len(parts) < 2:
+                    send_message(chat_id, "❌ Usage: /broadcast <your message>")
+                    continue
+                msg = parts[1]
+                success = 0
+                fail = 0
+                for uid in db:
+                    try:
+                        send_message(uid, f"📢 Broadcast from Admin:\n\n{msg}")
+                        success += 1
+                    except Exception as e:
+                        fail += 1
+                        print(f"❌ Failed to send to {uid}: {e}")
+                send_message(chat_id, f"✅ Broadcast done.\n🟢 Sent: {success}\n🔴 Failed: {fail}")
+
+            else:
+                # Normal Message
+                if not user_channels:
+                    send_message(chat_id, "⚠️ Pehle /addchannel se channel add karo.")
+                    continue
+                for cid in user_channels:
+                    try:
+                        copy_message(cid, message)
+                    except:
+                        send_message(chat_id, f"❌ Couldn't post to {cid}")
+
+        time.sleep(1)
+
+if __name__ == "__main__":
     main()
