@@ -23,7 +23,7 @@ Deploy for free with one click:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/img/deploy/button.svg)](https://app.koyeb.com/deploy)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?...)
 
 ---
 
